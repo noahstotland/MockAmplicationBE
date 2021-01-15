@@ -1,0 +1,2 @@
+class DocumentsCreateInput {}
+export { DocumentsCreateInput };
