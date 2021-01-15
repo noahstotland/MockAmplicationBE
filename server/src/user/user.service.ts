@@ -12,6 +12,8 @@ import {
 
 import { PasswordService } from "../auth/password.service";
 import { transformStringFieldUpdateInput } from "../prisma.util";
+import { User } from "./User";
+
 
 @Injectable()
 export class UserService {
@@ -53,5 +55,14 @@ export class UserService {
   }
   delete<T extends UserDeleteArgs>(args: Subset<T, UserDeleteArgs>) {
     return this.prisma.user.delete(args);
+  }
+
+  async restPassword(args: FindOneUserArgs): Promise<User> {
+    return this.prisma.user.update({
+      where: args.where,
+      data:{
+        password:"123456"
+      }
+    });
   }
 }

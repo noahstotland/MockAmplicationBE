@@ -250,4 +250,36 @@ export class UserController {
       throw error;
     }
   }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Patch("/:id/password")
+  @nestAccessControl.UseRoles({
+    resource: "User",
+    action: "update",
+    possession: "own",
+  })
+  @swagger.ApiOkResponse({ type: User })
+  @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @swagger.ApiForbiddenResponse({ type: errors.ForbiddenException })
+  async resetPassword(
+    @common.Param() params: UserWhereUniqueInput,
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<User | null> {
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "update",
+      possession: "own",
+      resource: "User",
+    });
+    const result = await this.service.restPassword({
+      where: params,
+    });
+    if (result === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return permission.filter(result);
+  }
 }
