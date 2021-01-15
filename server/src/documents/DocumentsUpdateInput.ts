@@ -1,0 +1,2 @@
+class DocumentsUpdateInput {}
+export { DocumentsUpdateInput };
